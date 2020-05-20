@@ -67,3 +67,23 @@ static String[] getPortForwarding(Session session){
   return bar;
 }
 ```
+
+---
+# Repository
+maven (**[Go to LATEST](http://nexus3.ymtech.co.kr/#browse/browse:maven-public:com%2Fjcraft%2Fjsch.ex)**)
+``` xml
+<repositories>
+  <repository>
+    <id>ymtech.kr</id>
+    <name>YMTECH Maven Repository</name>
+    <url>http://nexus3.ymtech.co.kr/repository/maven-public/</url>
+    <layout>default</layout>
+  </repository>
+</repositories>
+
+<dependency>
+  <groupId>com.jcraft</groupId>
+  <artifactId>jsch.ex</artifactId>
+  <version>${com-jcraft-jsch-ex.version}</version>
+</dependency>
+```
