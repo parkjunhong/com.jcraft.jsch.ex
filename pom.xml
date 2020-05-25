@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.jcraft</groupId>
-	<artifactId>jsch.ex</artifactId>
+	<groupId>open.commons.external</groupId>
+	<artifactId>com.craft.jsch</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1.55.1</version>
 	<name>JSch</name>
@@ -38,6 +38,7 @@
 			<url>https://github.com/parkjunhong</url>
 			<roles>
 				<role>developer</role>
+				<role>fixer</role>
 			</roles>
 			<timezone>+9</timezone>
 		</developer>
