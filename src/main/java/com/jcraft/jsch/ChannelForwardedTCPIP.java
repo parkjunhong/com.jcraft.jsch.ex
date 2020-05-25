@@ -56,6 +56,42 @@ public class ChannelForwardedTCPIP extends Channel {
         connected = true;
     }
 
+    void getData(Buffer buf) {
+        setRecipient(buf.getInt());
+        setRemoteWindowSize(buf.getUInt());
+        setRemotePacketSize(buf.getInt());
+        byte[] addr = buf.getString();
+        int port = buf.getInt();
+        byte[] orgaddr = buf.getString();
+        int orgport = buf.getInt();
+
+        /*
+         * System.err.println("addr: "+Util.byte2str(addr)); System.err.println("port: "+port);
+         * System.err.println("orgaddr: "+Util.byte2str(orgaddr)); System.err.println("orgport: "+orgport);
+         */
+
+        Session _session = null;
+        try {
+            _session = getSession();
+        } catch (JSchException e) {
+            // session has been already down.
+        }
+
+        this.config = getPort(_session, Util.byte2str(addr), port);
+        if (this.config == null)
+            this.config = getPort(_session, null, port);
+
+        if (this.config == null) {
+            if (JSch.getLogger().isEnabled(Logger.ERROR)) {
+                JSch.getLogger().log(Logger.ERROR, "ChannelForwardedTCPIP: " + Util.byte2str(addr) + ":" + port + " is not registered.");
+            }
+        }
+    }
+
+    public int getRemotePort() {
+        return (config != null ? config.rport : 0);
+    }
+
     public void run() {
         try {
             if (config instanceof ConfigDaemon) {
@@ -115,85 +151,9 @@ public class ChannelForwardedTCPIP extends Channel {
         disconnect();
     }
 
-    void getData(Buffer buf) {
-        setRecipient(buf.getInt());
-        setRemoteWindowSize(buf.getUInt());
-        setRemotePacketSize(buf.getInt());
-        byte[] addr = buf.getString();
-        int port = buf.getInt();
-        byte[] orgaddr = buf.getString();
-        int orgport = buf.getInt();
-
-        /*
-         * System.err.println("addr: "+Util.byte2str(addr)); System.err.println("port: "+port);
-         * System.err.println("orgaddr: "+Util.byte2str(orgaddr)); System.err.println("orgport: "+orgport);
-         */
-
-        Session _session = null;
-        try {
-            _session = getSession();
-        } catch (JSchException e) {
-            // session has been already down.
-        }
-
-        this.config = getPort(_session, Util.byte2str(addr), port);
-        if (this.config == null)
-            this.config = getPort(_session, null, port);
-
-        if (this.config == null) {
-            if (JSch.getLogger().isEnabled(Logger.ERROR)) {
-                JSch.getLogger().log(Logger.ERROR, "ChannelForwardedTCPIP: " + Util.byte2str(addr) + ":" + port + " is not registered.");
-            }
-        }
-    }
-
-    private static Config getPort(Session session, String address_to_bind, int rport) {
-        synchronized (pool) {
-            for (int i = 0; i < pool.size(); i++) {
-                Config bar = (Config) (pool.elementAt(i));
-                if (bar.session != session)
-                    continue;
-                if (bar.rport != rport) {
-                    if (bar.rport != 0 || bar.allocated_rport != rport)
-                        continue;
-                }
-                if (address_to_bind != null && !bar.address_to_bind.equals(address_to_bind))
-                    continue;
-                return bar;
-            }
-            return null;
-        }
-    }
-
-    static String[] getPortForwarding(Session session) {
-        Vector foo = new Vector();
-        synchronized (pool) {
-            for (int i = 0; i < pool.size(); i++) {
-                Config config = (Config) (pool.elementAt(i));
-                if (!config.session.equals(session)) {
-                    continue;
-                }
-                if (config instanceof ConfigDaemon)
-                    foo.addElement(config.allocated_rport + ":" + config.target + ":");
-                else
-                    foo.addElement(config.allocated_rport + ":" + config.target + ":" + ((ConfigLHost) config).lport);
-            }
-        }
-        String[] bar = new String[foo.size()];
-        for (int i = 0; i < foo.size(); i++) {
-            bar[i] = (String) (foo.elementAt(i));
-        }
-        return bar;
-    }
-
-    static String normalize(String address) {
-        if (address == null) {
-            return "localhost";
-        } else if (address.length() == 0 || address.equals("*")) {
-            return "";
-        } else {
-            return address;
-        }
+    private void setSocketFactory(SocketFactory factory) {
+        if (config != null && (config instanceof ConfigLHost))
+            ((ConfigLHost) config).factory = factory;
     }
 
     static void addPort(Session session, String _address_to_bind, int port, int allocated_port, String target, int lport, SocketFactory factory) throws JSchException {
@@ -242,6 +202,23 @@ public class ChannelForwardedTCPIP extends Channel {
             delPort(_session, c.config.rport);
     }
 
+    static void delPort(Session session) {
+        int[] rport = null;
+        int count = 0;
+        synchronized (pool) {
+            rport = new int[pool.size()];
+            for (int i = 0; i < pool.size(); i++) {
+                Config config = (Config) (pool.elementAt(i));
+                if (config.session == session) {
+                    rport[count++] = config.rport; // ((Integer)bar[1]).intValue();
+                }
+            }
+        }
+        for (int i = 0; i < count; i++) {
+            delPort(session, rport[i]);
+        }
+    }
+
     static void delPort(Session session, int rport) {
         delPort(session, null, rport);
     }
@@ -283,30 +260,57 @@ public class ChannelForwardedTCPIP extends Channel {
         }
     }
 
-    static void delPort(Session session) {
-        int[] rport = null;
-        int count = 0;
+    private static Config getPort(Session session, String address_to_bind, int rport) {
         synchronized (pool) {
-            rport = new int[pool.size()];
+            for (int i = 0; i < pool.size(); i++) {
+                Config bar = (Config) (pool.elementAt(i));
+                if (bar.session != session)
+                    continue;
+                if (bar.rport != rport) {
+                    if (bar.rport != 0 || bar.allocated_rport != rport)
+                        continue;
+                }
+                if (address_to_bind != null && !bar.address_to_bind.equals(address_to_bind))
+                    continue;
+                return bar;
+            }
+            return null;
+        }
+    }
+
+    static String[] getPortForwarding(Session session) {
+        Vector foo = new Vector();
+        synchronized (pool) {
             for (int i = 0; i < pool.size(); i++) {
                 Config config = (Config) (pool.elementAt(i));
-                if (config.session == session) {
-                    rport[count++] = config.rport; // ((Integer)bar[1]).intValue();
+                // (start) [BUG-FIX]: check an instance of a session / Park_Jun_Hong_(parkjunhong77_at_gmail_com): 2020.
+                // 5. 25. PM. 5:34:14
+                if (!config.session.equals(session)) {
+                    continue;
                 }
+                // (end): 2020. 5. 25. PM. 5:34:14
+
+                if (config instanceof ConfigDaemon)
+                    foo.addElement(config.allocated_rport + ":" + config.target + ":");
+                else
+                    foo.addElement(config.allocated_rport + ":" + config.target + ":" + ((ConfigLHost) config).lport);
             }
         }
-        for (int i = 0; i < count; i++) {
-            delPort(session, rport[i]);
+        String[] bar = new String[foo.size()];
+        for (int i = 0; i < foo.size(); i++) {
+            bar[i] = (String) (foo.elementAt(i));
         }
+        return bar;
     }
 
-    public int getRemotePort() {
-        return (config != null ? config.rport : 0);
-    }
-
-    private void setSocketFactory(SocketFactory factory) {
-        if (config != null && (config instanceof ConfigLHost))
-            ((ConfigLHost) config).factory = factory;
+    static String normalize(String address) {
+        if (address == null) {
+            return "localhost";
+        } else if (address.length() == 0 || address.equals("*")) {
+            return "";
+        } else {
+            return address;
+        }
     }
 
     static abstract class Config {
