@@ -54,13 +54,13 @@
 		<repository>
 			<id>releases</id>
 			<name>Release Repository</name>
-			<url>http://nexus3.ymtech.co.kr/repository/maven-releases/</url>
+			<url>https://nexus3.ymtech.co.kr/repository/maven-releases/</url>
 			<!-- <url>http://maven.ymtech.co.kr/nexus/content/repositories/releases/</url> -->
 		</repository>
 		<snapshotRepository>
 			<id>snapshots</id>
 			<name>Snapshot Repository</name>
-			<url>http://nexus3.ymtech.co.kr/repository/maven-snapshots/</url>
+			<url>https://nexus3.ymtech.co.kr/repository/maven-snapshots/</url>
 			<!-- <url>http://maven.ymtech.co.kr/nexus/content/repositories/snapshots/</url> -->
 		</snapshotRepository>
 	</distributionManagement>	
