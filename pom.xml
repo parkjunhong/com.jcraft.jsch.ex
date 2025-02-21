@@ -1,7 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>open.commons.external</groupId>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>6</version>
+	</parent>
+	<groupId>io.github.open-commons-ext</groupId>
 	<artifactId>com.craft.jsch</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1.55.1</version>
@@ -12,6 +16,12 @@
 		<name>JCraft,Inc.</name>
 		<url>http://www.jcraft.com/</url>
 	</organization>
+	<licenses>
+		<license>
+			<name>Revised BSD</name>
+			<url>http://www.jcraft.com/jsch/LICENSE.txt</url>
+		</license>
+	</licenses>
 	<scm>
 		<connection>scm:git:http://git.jcraft.com/jsch.git</connection>
 		<developerConnection>scm:git:http://git.jcraft.com/jsch.git</developerConnection>
@@ -35,7 +45,7 @@
 			<id>parkjunhong77</id>
 			<name>Park, Jun-Hong</name>
 			<email>parkjunhong at google D0t com</email>
-			<url>https://github.com/parkjunhong</url>
+			<url>https://github.com/open-commons-ext</url>
 			<roles>
 				<role>developer</role>
 				<role>fixer</role>
@@ -43,28 +53,19 @@
 			<timezone>+9</timezone>
 		</developer>
 	</developers>
-	<licenses>
-		<license>
-			<name>Revised BSD</name>
-			<url>http://www.jcraft.com/jsch/LICENSE.txt</url>
-		</license>
-	</licenses>
 
 	<distributionManagement>
 		<repository>
-			<id>releases</id>
-			<name>Release Repository</name>
-			<url>https://nexus3.ymtech.co.kr/repository/maven-releases/</url>
-			<!-- <url>http://maven.ymtech.co.kr/nexus/content/repositories/releases/</url> -->
+			<id>maven-central</id>
+			<url>https://central.sonatype.com</url>
 		</repository>
 		<snapshotRepository>
-			<id>snapshots</id>
+			<id>ymtech-maven-repo</id>
 			<name>Snapshot Repository</name>
 			<url>https://nexus3.ymtech.co.kr/repository/maven-snapshots/</url>
-			<!-- <url>http://maven.ymtech.co.kr/nexus/content/repositories/snapshots/</url> -->
 		</snapshotRepository>
-	</distributionManagement>	
-	
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.jcraft</groupId>
@@ -107,8 +108,35 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-gpg-plugin</artifactId> <executions> <execution> <id>sign-artifacts</id> 
-				<phase>verify</phase> <goals> <goal>sign</goal> </goals> </execution> </executions> </plugin> -->
+
+			<!-- Maven Central Deployment plugin -->
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.7.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>maven-central</publishingServerId>
+					<!-- autoPublish>true</autoPublish>
+             		<waitUntil>published</waitUntil -->
+				</configuration>
+			</plugin>
+			<!-- GPG signature plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 		<extensions>
 			<extension>
@@ -118,10 +146,4 @@
 			</extension>
 		</extensions>
 	</build>
-
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>6</version>
-	</parent>
 </project>
