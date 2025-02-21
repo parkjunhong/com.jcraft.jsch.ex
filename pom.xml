@@ -1,10 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>6</version>
-	</parent>
 	<groupId>io.github.open-commons-ext</groupId>
 	<artifactId>com.craft.jsch</artifactId>
 	<packaging>jar</packaging>
@@ -54,6 +49,12 @@
 		</developer>
 	</developers>
 
+	<properties>
+		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+		<maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+	</properties>
+
 	<distributionManagement>
 		<repository>
 			<id>maven-central</id>
@@ -80,6 +81,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven-source-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -92,6 +94,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<target>1.5</target>
 				</configuration>
@@ -99,6 +102,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
