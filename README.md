@@ -70,20 +70,12 @@ static String[] getPortForwarding(Session session){
 
 ---
 # Repository
-maven (**[Go to LATEST](https://nexus3.ymtech.co.kr/#browse/browse:maven-public:open%2Fcommons%2Fexternal%2Fcom.craft.jsch)**)
+maven (**[Go to LATEST](https://central.sonatype.com/artifact/io.github.open-commons-ext/com.craft.jsch)**)
 ``` xml
-<repositories>
-  <repository>
-    <id>ymtech.kr</id>
-    <name>YMTECH Maven Repository</name>
-    <url>https://nexus3.ymtech.co.kr/repository/maven-public/</url>
-    <layout>default</layout>
-  </repository>
-</repositories>
 
 <dependency>
-  <groupId>open.commons.external</groupId>
-  <artifactId>com.craft.jsch</artifactId>
+    <groupId>io.github.open-commons-ext</groupId>
+    <artifactId>com.craft.jsch</artifactId>
   <version>${com-jcraft-jsch-ex.version}</version>
 </dependency>
 ```
